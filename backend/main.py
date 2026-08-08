@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends,HTTPException,status
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 # 1. Faculty Model
@@ -77,10 +77,9 @@ def get_faculty_by_id(faculty_id: str, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Faculty member not found")
     return faculty
 
-# POST new faculty member
-@app.post("/faculty/", response_model=Faculty, status_code=status.HTTP_217_CREATED if hasattr(status, 'HTTP_217_CREATED') else 201)
+@app.post("/faculty/", response_model=Faculty, status_code=status.HTTP_201_CREATED)
 def create_faculty(faculty: Faculty, session: Session = Depends(get_session)):
     session.add(faculty)
     session.commit()
     session.refresh(faculty)
-    return faculty
+    return faculty 
