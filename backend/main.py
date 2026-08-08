@@ -70,3 +70,14 @@ def get_all_faculty(session: Session = Depends(get_session)):
 @app.get("/faculty/{faculty_id}", response_model=Faculty)
 def get_faculty_by_id(faculty_id: str, session: Session = Depends(get_session)):
     return session.get(Faculty, faculty_id)
+@app.get("/faculty/", response_model=list[Faculty])
+def get_all_faculty(session: Session = Depends(get_session)):
+    return session.exec(select(Faculty)).all()
+
+# ADD THIS NEW ROUTE: POST endpoint to add a new faculty member
+@app.post("/faculty/", response_model=Faculty)
+def create_faculty(faculty: Faculty, session: Session = Depends(get_session)):
+    session.add(faculty)
+    session.commit()
+    session.refresh(faculty)
+    return faculty
