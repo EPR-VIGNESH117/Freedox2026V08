@@ -63,19 +63,22 @@ def get_session():
         yield session
 
 # 4. API Endpoints
+
+# GET all faculty members
 @app.get("/faculty/", response_model=list[Faculty])
 def get_all_faculty(session: Session = Depends(get_session)):
     return session.exec(select(Faculty)).all()
 
+# GET single faculty member by ID
 @app.get("/faculty/{faculty_id}", response_model=Faculty)
 def get_faculty_by_id(faculty_id: str, session: Session = Depends(get_session)):
-    return session.get(Faculty, faculty_id)
-@app.get("/faculty/", response_model=list[Faculty])
-def get_all_faculty(session: Session = Depends(get_session)):
-    return session.exec(select(Faculty)).all()
+    faculty = session.get(Faculty, faculty_id)
+    if not faculty:
+        raise HTTPException(status_code=404, detail="Faculty member not found")
+    return faculty
 
-# ADD THIS NEW ROUTE: POST endpoint to add a new faculty member
-@app.post("/faculty/", response_model=Faculty)
+# POST new faculty member
+@app.post("/faculty/", response_model=Faculty, status_code=status.HTTP_217_CREATED if hasattr(status, 'HTTP_217_CREATED') else 201)
 def create_faculty(faculty: Faculty, session: Session = Depends(get_session)):
     session.add(faculty)
     session.commit()
